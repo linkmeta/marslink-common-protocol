@@ -25,6 +25,8 @@ public class TopicMessageCodec {
             message = handleFaultAlarm(topic, payload);
         } else if (topic.startsWith("/sensor_status")) {
             message = handleSensorStatus(topic, payload);
+        } else if (topic.startsWith("/client_status")) {
+            message = handleClientStatus(topic, payload);
         } else if (topic.startsWith("/register")) {
             message = handleRegister(payload);
         } else if (topic.startsWith("/unregister")) {
@@ -117,6 +119,7 @@ public class TopicMessageCodec {
 
     private DeviceRegisterMessage handleRegister(JSONObject json) {
         DeviceRegisterMessage reply = new DeviceRegisterMessage();
+        JSONObject data = new JSONObject();
         reply.setMessageId(IDGenerator.SNOW_FLAKE_STRING.generate());
         reply.setDeviceId(json.getString("deviceId"));
         reply.setTimestamp(System.currentTimeMillis());
@@ -188,7 +191,15 @@ public class TopicMessageCodec {
         eventMessage.setData(new HashMap<>(json));
         return eventMessage;
     }
+    private EventMessage handleClientStatus(String topic, JSONObject json) {
+        EventMessage eventMessage = new EventMessage();
 
+        eventMessage.setDeviceId(json.getString("deviceId"));
+        eventMessage.setEvent("client_status");
+        eventMessage.setMessageId(IDGenerator.SNOW_FLAKE_STRING.generate());
+        eventMessage.setData(new HashMap<>(json));
+        return eventMessage;
+    }
     private EventMessage handleDeviceMessage(String topic, JSONObject json) {
         EventMessage eventMessage = new EventMessage();
 
